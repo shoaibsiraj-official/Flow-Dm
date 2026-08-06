@@ -31,22 +31,31 @@ export default function LoginPage() {
 
   const onSubmit = async (data) => {
     setServerError("");
+
     try {
-      // await axios.post("/api/auth/login", data)
-      await new Promise((r) => setTimeout(r, 1100));
-      // Simulated auth check for demo purposes
-      if (data.password.length < 4) {
-        setServerError("That email and password combination doesn't match our records.");
-        return;
-      }
-      window.location.href = "/dashboard";
-    } catch {
-      console.log("FULL ERROR:", error);
+      const res = await authAPI.login({
+        username: data.username,
+        password: data.password,
+      });
 
-      console.log("STATUS:", error.response?.status);
+      console.log("FULL RESPONSE:", res);
+      console.log("DATA:", res.data);
+      console.log("ACCESS:", res.data.access);
+      console.log("REFRESH:", res.data.refresh);
 
-      console.log("DATA:", error.response?.data);
-      setServerError("Something went wrong on our end. Try again in a moment.");
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
+
+      console.log("LOCAL:", localStorage.getItem("access"));
+
+      router.push("/dashboard");
+    } catch (error) {
+      console.log(error.response?.data);
+
+      setServerError(
+        error.response?.data?.detail ||
+        "Invalid username or password"
+      );
     }
   };
 

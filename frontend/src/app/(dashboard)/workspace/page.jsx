@@ -1,16 +1,33 @@
 "use client";
-
-import { useState } from "react";
-import { Plus, Camera } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, Camera, } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { Button } from "@/components/ui/button";
 import { AccountCard } from "@/components/workspace/account-card";
 import { ConnectAccountModal } from "@/components/workspace/connect-account-modal";
-import { connectedAccounts as initialAccounts } from "@/lib/mock/workspace-data";
+import { instagramAPI } from "@/lib/instagramApi";
 
 export default function WorkspacePage() {
-  const [accounts, setAccounts] = useState(initialAccounts);
+  const [accounts, setAccounts] = useState([]);
   const [showConnect, setShowConnect] = useState(false);
+  useEffect(() => {
+    loadAccounts();
+  }, []);
+
+
+const loadAccounts = async () => {
+  try {
+    const res = await instagramAPI.getAccounts();
+
+    console.log("STATUS:", res.status);
+    console.log("DATA:", res.data);
+
+    setAccounts(res.data);
+  } catch (err) {
+    console.log("ERROR:", err.response?.status);
+    console.log("ERROR DATA:", err.response?.data);
+  }
+};
 
   const handleReconnect = (id) => {
     setAccounts((prev) =>
@@ -35,6 +52,23 @@ export default function WorkspacePage() {
     ]);
   };
 
+  const connectInstagram = async () => {
+    try {
+      const res = await instagramAPI.loginURL();
+
+      console.log("LOGIN URL RESPONSE:", res.data);
+
+      window.location.href = res.data.url;
+    } catch (err) {
+      console.log("STATUS:", err.response?.status);
+      console.log("URL:", err.config?.url);
+      console.log("DATA:", err.response?.data);
+      console.log("HEADERS:", err.config?.headers);
+    }
+  };
+
+
+
   return (
     <DashboardShell breadcrumb={[{ label: "Workspace" }, { label: "Instagram accounts" }]}>
       <div className="mb-6 flex items-center justify-between">
@@ -44,9 +78,10 @@ export default function WorkspacePage() {
             Connect every account you want FlowDM AI to monitor and automate.
           </p>
         </div>
-        <Button onClick={() => setShowConnect(true)}>
+        <Button onClick={connectInstagram}>
           <Plus className="h-4 w-4" /> Connect account
         </Button>
+
       </div>
 
       {accounts.length === 0 ? (
@@ -80,7 +115,7 @@ function EmptyState({ onConnect }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
       <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary-400">
-        <Instagram className="h-6 w-6" />
+        <Camera className="h-6 w-6" />
       </div>
       <p className="mt-4 text-[15px] font-semibold text-foreground">No accounts connected yet</p>
       <p className="mt-1 max-w-sm text-[13px] text-muted-foreground">

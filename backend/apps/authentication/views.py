@@ -96,7 +96,7 @@ class LoginView(APIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         user = services.authenticate_user(
-            email=data["email"], password=data["password"], ip=_client_ip(request), user_agent=_user_agent(request)
+            user=data["username"], password=data["password"], ip=_client_ip(request), user_agent=_user_agent(request)
         )
         tokens = services.issue_tokens_for_user(user)
         return Response({**tokens, "user": UserSerializer(user).data})

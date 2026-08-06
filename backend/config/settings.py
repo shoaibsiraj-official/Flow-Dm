@@ -52,7 +52,9 @@ INSTALLED_APPS = [
     "apps.instagram",
     "apps.automation",
     "apps.core",
-    # "apps.common",
+    "apps.common",
+    "apps.utils",
+    "apps.services",
 ]
 
 
@@ -113,6 +115,8 @@ REST_FRAMEWORK = {
 
 
 
+
+
 SIMPLE_JWT = {
 
     "ACCESS_TOKEN_LIFETIME": timedelta(
@@ -144,10 +148,25 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "definite-guru-likeness.ngrok-free.dev",
+]
+
 ROOT_URLCONF = "config.urls"
 
+from decouple import config
+
+META_APP_ID = config("META_APP_ID")
+META_APP_SECRET = config("META_APP_SECRET")
+META_WEBHOOK_VERIFY_TOKEN = config("META_WEBHOOK_VERIFY_TOKEN","flowdm2026")
+META_GRAPH_API_VERSION = config("META_GRAPH_API_VERSION", default="v20.0")
+META_CONFIG_ID = config("META_CONFIG_ID")
+META_REDIRECT_URI = config("META_REDIRECT_URI")
 
 
+FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY")
 
 EMAIL_VERIFICATION_TOKEN_TTL_HOURS = 24
 PASSWORD_RESET_TOKEN_TTL_HOURS = 1

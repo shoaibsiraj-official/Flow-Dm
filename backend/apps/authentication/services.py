@@ -92,14 +92,14 @@ def resend_verification_email(*, user: User):
     issue_email_verification(user)
 
 
-def authenticate_user(*, email: str, password: str, ip=None, user_agent="") -> User:
-    user = get_user_by_email(email)
+def authenticate_user(*, user: str, password: str, ip=None, user_agent="") -> User:
+    user = get_user_by_username(user)
     if user is None or not user.check_password(password):
         if user:
             _register_failed_attempt(user, ip=ip, user_agent=user_agent)
         else:
-            log_auth_event(email_attempted=email, action=AuthenticationLog.Action.LOGIN_FAILED, ip=ip, user_agent=user_agent)
-        raise ApplicationError("Invalid email or password.", code="invalid_credentials", status_code=401)
+            log_auth_event(user_attempted=user, action=AuthenticationLog.Action.LOGIN_FAILED, ip=ip, user_agent=user_agent)
+        raise ApplicationError("Invalid username or password.", code="invalid_credentials", status_code=401)
 
     if user.is_locked:
         raise ApplicationError(
